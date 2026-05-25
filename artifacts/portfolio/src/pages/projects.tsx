@@ -40,7 +40,7 @@ export default function Projects() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen text-foreground">
         <div className="px-6 max-w-screen-2xl mx-auto">
           {/* Header */}
           <header className="mb-16 mt-6">

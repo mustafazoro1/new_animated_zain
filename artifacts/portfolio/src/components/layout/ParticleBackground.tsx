@@ -5,6 +5,8 @@ interface Particle {
   y: number;
   vx: number;
   vy: number;
+  baseVx: number;
+  baseVy: number;
   size: number;
   opacity: number;
   baseOpacity: number;
@@ -29,16 +31,22 @@ export function ParticleBackground() {
     resize();
     window.addEventListener("resize", resize);
 
-    const COUNT = 55;
-    particles.current = Array.from({ length: COUNT }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.35,
-      vy: (Math.random() - 0.5) * 0.35,
-      size: Math.random() * 1.6 + 0.4,
-      opacity: 0,
-      baseOpacity: Math.random() * 0.25 + 0.08,
-    }));
+    const COUNT = 100;
+    particles.current = Array.from({ length: COUNT }, () => {
+      const bvx = (Math.random() - 0.5) * 0.45;
+      const bvy = (Math.random() - 0.5) * 0.45;
+      return {
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: bvx,
+        vy: bvy,
+        baseVx: bvx,
+        baseVy: bvy,
+        size: Math.random() * 1.8 + 0.5,
+        opacity: 0,
+        baseOpacity: Math.random() * 0.28 + 0.08,
+      };
+    });
 
     const onMouseMove = (e: MouseEvent) => {
       mouse.current = { x: e.clientX, y: e.clientY };
@@ -49,28 +57,40 @@ export function ParticleBackground() {
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseleave", onMouseLeave);
 
-    const REPEL_RADIUS = 120;
-    const REPEL_STRENGTH = 0.55;
+    const REPEL_RADIUS = 200;
+    const REPEL_STRENGTH = 2.2;
+    const CONNECT_DIST = 130;
+    const GLOW_RADIUS = 80;
 
     const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "hsl(220, 18%, 9%)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const mx = mouse.current.x;
+      const my = mouse.current.y;
+      const hasMouse = mx > -1000;
 
       for (const p of particles.current) {
-        const dx = p.x - mouse.current.x;
-        const dy = p.y - mouse.current.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        const dx = p.x - mx;
+        const dy = p.y - my;
+        const distSq = dx * dx + dy * dy;
+        const dist = Math.sqrt(distSq);
 
-        if (dist < REPEL_RADIUS && dist > 0) {
+        if (hasMouse && dist < REPEL_RADIUS && dist > 0) {
           const force = ((REPEL_RADIUS - dist) / REPEL_RADIUS) * REPEL_STRENGTH;
-          p.vx += (dx / dist) * force;
-          p.vy += (dy / dist) * force;
-          p.opacity = Math.min(p.baseOpacity + 0.3, 0.7);
+          const normalizedForce = force * (1 - dist / REPEL_RADIUS);
+          p.vx += (dx / dist) * normalizedForce;
+          p.vy += (dy / dist) * normalizedForce;
+          const brighten = 1 - dist / REPEL_RADIUS;
+          p.opacity = Math.min(p.baseOpacity + brighten * 0.65, 0.92);
         } else {
-          p.opacity += (p.baseOpacity - p.opacity) * 0.04;
+          p.opacity += (p.baseOpacity - p.opacity) * 0.06;
+          p.vx += (p.baseVx - p.vx) * 0.015;
+          p.vy += (p.baseVy - p.vy) * 0.015;
         }
 
-        p.vx *= 0.97;
-        p.vy *= 0.97;
+        p.vx *= 0.94;
+        p.vy *= 0.94;
         p.x += p.vx;
         p.y += p.vy;
 
@@ -79,8 +99,18 @@ export function ParticleBackground() {
         if (p.y < 0) p.y = canvas.height;
         if (p.y > canvas.height) p.y = 0;
 
+        const inGlow = hasMouse && dist < GLOW_RADIUS;
+        const drawSize = inGlow ? p.size * (1.5 + (1 - dist / GLOW_RADIUS)) : p.size;
+
+        if (inGlow) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, drawSize * 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(200, 146, 42, ${p.opacity * 0.15})`;
+          ctx.fill();
+        }
+
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, drawSize, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(200, 146, 42, ${p.opacity})`;
         ctx.fill();
       }
@@ -92,13 +122,34 @@ export function ParticleBackground() {
           const dx = a.x - b.x;
           const dy = a.y - b.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 90) {
-            const alpha = (1 - dist / 90) * 0.07;
+          if (dist < CONNECT_DIST) {
+            const fade = 1 - dist / CONNECT_DIST;
+            const alpha = fade * fade * 0.12;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
             ctx.strokeStyle = `rgba(200, 146, 42, ${alpha})`;
-            ctx.lineWidth = 0.5;
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+          }
+        }
+      }
+
+      if (hasMouse) {
+        let closestDist = Infinity;
+        for (const p of particles.current) {
+          const dx = p.x - mx;
+          const dy = p.y - my;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < closestDist) closestDist = dist;
+
+          if (dist < REPEL_RADIUS * 0.7) {
+            const alpha = (1 - dist / (REPEL_RADIUS * 0.7)) * 0.08;
+            ctx.beginPath();
+            ctx.moveTo(mx, my);
+            ctx.lineTo(p.x, p.y);
+            ctx.strokeStyle = `rgba(200, 146, 42, ${alpha})`;
+            ctx.lineWidth = 0.4;
             ctx.stroke();
           }
         }
@@ -121,7 +172,6 @@ export function ParticleBackground() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 1 }}
     />
   );
 }

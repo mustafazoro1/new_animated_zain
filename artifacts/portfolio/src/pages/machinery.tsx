@@ -16,7 +16,7 @@ export default function Machinery() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen text-foreground">
         {/* Header */}
         <section className="pt-40 pb-16 px-6 border-b border-[hsl(220,15%,18%)]">
           <div className="max-w-screen-2xl mx-auto">

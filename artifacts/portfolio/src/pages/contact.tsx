@@ -22,7 +22,7 @@ export default function Contact() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen text-foreground">
 
         {/* Hero with background image */}
         <section className="relative pt-40 pb-24 px-6 border-b border-[hsl(220,15%,18%)] overflow-hidden">

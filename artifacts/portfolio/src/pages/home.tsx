@@ -28,7 +28,7 @@ export default function Home() {
 
   return (
     <PageTransition>
-      <div className="bg-background min-h-screen text-foreground">
+      <div className="min-h-screen text-foreground">
         {/* Full-screen Accordion */}
         <section className="h-screen w-full flex overflow-hidden">
           {isLoading ? (
@@ -60,7 +60,7 @@ export default function Home() {
                     <div className={`absolute inset-0 bg-[hsl(220,18%,9%)/30%] transition-opacity duration-700 ${isHovered ? "opacity-0" : "opacity-100"}`} />
                     <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
                       <motion.div animate={{ opacity: 1, y: isHovered ? 0 : 5 }} transition={{ duration: 0.4 }}>
-                        <motion.p animate={{ opacity: isHovered ? 1 : 0.5 }} className="text-[10px] tracking-[0.3em] uppercase text-[hsl(38,72%,52%)] mb-2 whitespace-nowrap overflow-hidden text-ellipsis">
+                        <motion.p animate={{ opacity: isHovered ? 1 : 0.82 }} className="text-[11px] tracking-[0.3em] uppercase text-[hsl(38,72%,65%)] mb-2 whitespace-nowrap overflow-hidden text-ellipsis font-semibold" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.7)" }}>
                           {project.location || "Global"}
                         </motion.p>
                         <motion.h2 animate={{ opacity: isHovered || hoveredIndex === null ? 1 : 0.3 }} className="text-xl md:text-2xl lg:text-4xl font-serif font-bold tracking-tight uppercase leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
@@ -133,7 +133,7 @@ export default function Home() {
 
         {/* Machinery Section */}
         {featuredMachinery.length > 0 && (
-          <section className="py-24 px-6 bg-[hsl(220,18%,10%)] border-y border-[hsl(220,15%,18%)]">
+          <section className="py-24 px-6 bg-[hsl(220,18%,10%)]/70 border-y border-[hsl(220,15%,18%)] backdrop-blur-sm">
             <div className="max-w-screen-2xl mx-auto">
               <div className="flex justify-between items-end mb-14">
                 <div>

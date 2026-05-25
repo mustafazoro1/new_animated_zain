@@ -43,7 +43,7 @@ export function Navbar() {
             <span className="text-xl font-serif font-bold tracking-tight uppercase text-foreground leading-none">
               Zain Manzoor
             </span>
-            <span className="text-[10px] tracking-[0.35em] uppercase text-[hsl(38,72%,52%)] font-sans font-medium leading-tight mt-0.5">
+            <span className="text-[11px] tracking-[0.35em] uppercase text-[hsl(38,72%,68%)] font-sans font-semibold leading-tight mt-0.5" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.8)" }}>
               Co.
             </span>
           </Link>

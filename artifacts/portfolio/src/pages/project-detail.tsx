@@ -22,7 +22,7 @@ export default function ProjectDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-[hsl(220,15%,25%)] border-t-[hsl(38,72%,52%)] rounded-full animate-spin" />
       </div>
     );
@@ -30,7 +30,7 @@ export default function ProjectDetail() {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center text-foreground">
+      <div className="min-h-screen flex items-center justify-center text-foreground">
         <h1 className="text-2xl font-serif">Project not found</h1>
       </div>
     );
@@ -56,7 +56,7 @@ export default function ProjectDetail() {
 
   return (
     <PageTransition>
-      <div className="bg-background min-h-screen text-foreground">
+      <div className="min-h-screen text-foreground">
         {/* Section A: Hero */}
         <section ref={heroRef} className="relative h-screen w-full overflow-hidden">
           <motion.div
