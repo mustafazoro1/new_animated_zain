@@ -1,14 +1,15 @@
 import { AdminLayout } from "@/components/layout/AdminLayout";
-import { useListMachinery, useToggleMachineryPublish, useDeleteMachinery, getListMachineryQueryKey } from "@workspace/api-client-react";
+import { useListMachinery, useToggleMachineryPublish, useUpdateMachinery, useDeleteMachinery, getListMachineryQueryKey } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, Globe, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Globe, EyeOff, Star } from "lucide-react";
 import { useState } from "react";
 
 export default function AdminMachinery() {
   const { data: machinery = [], isLoading } = useListMachinery();
   const togglePublish = useToggleMachineryPublish();
+  const updateMachinery = useUpdateMachinery();
   const deleteMachinery = useDeleteMachinery();
   const queryClient = useQueryClient();
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
@@ -16,6 +17,13 @@ export default function AdminMachinery() {
   const handleToggle = (id: number, published: boolean) => {
     togglePublish.mutate(
       { id, data: { published } },
+      { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListMachineryQueryKey() }) }
+    );
+  };
+
+  const handleFeature = (item: typeof machinery[number]) => {
+    updateMachinery.mutate(
+      { id: item.id, data: { name: item.name, slug: item.slug, featured: !item.featured } },
       { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListMachineryQueryKey() }) }
     );
   };
@@ -48,6 +56,11 @@ export default function AdminMachinery() {
         </Link>
       </div>
 
+      <p className="text-[10px] tracking-[0.2em] uppercase text-[hsl(220,12%,40%)] mb-4">
+        <Star size={9} className="inline mr-1.5 text-[hsl(38,72%,52%)]" fill="currentColor" />
+        Star marks equipment featured on the home page
+      </p>
+
       {isLoading ? (
         <div className="space-y-3">
           {[1,2,3].map(i => <div key={i} className="h-16 bg-[hsl(220,18%,11%)] border border-[hsl(220,15%,18%)] animate-pulse" />)}
@@ -57,7 +70,7 @@ export default function AdminMachinery() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-[hsl(220,18%,11%)] border-b border-[hsl(220,15%,18%)]">
-                {["Equipment", "Category", "Year", "Condition", "Visibility", "Actions"].map(h => (
+                {["Equipment", "Category", "Year", "Condition", "Home", "Visibility", "Actions"].map(h => (
                   <th key={h} className="px-4 py-3 text-[9px] tracking-[0.25em] uppercase text-[hsl(220,12%,40%)] font-medium">{h}</th>
                 ))}
               </tr>
@@ -80,11 +93,25 @@ export default function AdminMachinery() {
                   <td className="px-4 py-3 text-xs text-[hsl(220,12%,55%)]">{item.condition || "—"}</td>
                   <td className="px-4 py-3">
                     <button
+                      onClick={() => handleFeature(item)}
+                      disabled={updateMachinery.isPending}
+                      title={item.featured ? "Remove from home page" : "Show on home page"}
+                      className="transition-colors"
+                    >
+                      <Star
+                        size={14}
+                        className={item.featured ? "text-[hsl(38,72%,52%)]" : "text-[hsl(220,12%,30%)] hover:text-[hsl(220,12%,55%)]"}
+                        fill={item.featured ? "currentColor" : "none"}
+                      />
+                    </button>
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
                       onClick={() => handleToggle(item.id, !item.published)}
                       className={`inline-flex items-center gap-1.5 text-[9px] px-2.5 py-1 tracking-[0.15em] uppercase border transition-all ${
                         item.published
                           ? "border-green-800 text-green-500 hover:bg-green-900/20"
-                          : "border-[hsl(220,15%,25%)] text-[hsl(220,12%,45%)] hover:border-[hsl(38,72%,52%)/50%]"
+                          : "border-[hsl(220,15%,25%)] text-[hsl(220,12%,45%)] hover:border-[hsl(220,15%,35%)]"
                       }`}
                     >
                       {item.published ? <Globe size={9} /> : <EyeOff size={9} />}
@@ -115,7 +142,7 @@ export default function AdminMachinery() {
               ))}
               {machinery.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-[hsl(220,12%,40%)] text-xs tracking-widest uppercase">
+                  <td colSpan={7} className="px-4 py-12 text-center text-[hsl(220,12%,40%)] text-xs tracking-widest uppercase">
                     No equipment added yet
                   </td>
                 </tr>

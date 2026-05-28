@@ -18,6 +18,7 @@ export interface ProjectSummary {
   sector?: string | null;
   status: string;
   published: boolean;
+  featured?: boolean;
   /** @nullable */
   categoryId?: number | null;
   /** @nullable */

@@ -17,6 +17,7 @@ export const projectsTable = pgTable("projects", {
   year: text("year"),
   longDescription: text("long_description"),
   published: boolean("published").notNull().default(false),
+  featured: boolean("featured").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

@@ -3,12 +3,13 @@ import {
   useListProjects,
   useDeleteProject,
   useToggleProjectPublish,
+  useUpdateProject,
   getListProjectsQueryKey,
 } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Image, Trash2, Globe, EyeOff } from "lucide-react";
+import { Plus, Pencil, Image, Trash2, Globe, EyeOff, Star } from "lucide-react";
 import { useState } from "react";
 
 export default function AdminDashboard() {
@@ -18,9 +19,18 @@ export default function AdminDashboard() {
   const queryClient = useQueryClient();
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
 
+  const updateProject = useUpdateProject();
+
   const handleToggle = (id: number, published: boolean) => {
     togglePublish.mutate(
       { id, data: { published } },
+      { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListProjectsQueryKey() }) }
+    );
+  };
+
+  const handleFeature = (project: typeof projects[number]) => {
+    updateProject.mutate(
+      { id: project.id, data: { title: project.title, slug: project.slug, status: project.status, featured: !project.featured } },
       { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListProjectsQueryKey() }) }
     );
   };
@@ -82,7 +92,7 @@ export default function AdminDashboard() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-[hsl(220,18%,11%)] border-b border-[hsl(220,15%,18%)]">
-                {["Project", "Location", "Sector", "Status", "Visibility", "Actions"].map(h => (
+                {["Project", "Location", "Sector", "Status", "Home", "Visibility", "Actions"].map(h => (
                   <th key={h} className="px-4 py-3 text-[9px] tracking-[0.25em] uppercase text-[hsl(220,12%,40%)] font-medium">
                     {h}
                   </th>
@@ -106,6 +116,21 @@ export default function AdminDashboard() {
                   <td className="px-4 py-3 text-xs text-[hsl(220,12%,55%)]">{project.location || "—"}</td>
                   <td className="px-4 py-3 text-xs text-[hsl(220,12%,55%)]">{project.sector || "—"}</td>
                   <td className="px-4 py-3 text-xs text-[hsl(220,12%,55%)]">{project.status}</td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => handleFeature(project)}
+                      disabled={updateProject.isPending}
+                      title={project.featured ? "Remove from home page" : "Show on home page"}
+                      className="transition-colors"
+                      data-testid={`button-feature-${project.id}`}
+                    >
+                      <Star
+                        size={14}
+                        className={project.featured ? "text-[hsl(38,72%,52%)]" : "text-[hsl(220,12%,30%)] hover:text-[hsl(220,12%,55%)]"}
+                        fill={project.featured ? "currentColor" : "none"}
+                      />
+                    </button>
+                  </td>
                   <td className="px-4 py-3">
                     <button
                       onClick={() => handleToggle(project.id, !project.published)}

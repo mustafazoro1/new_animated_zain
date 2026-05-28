@@ -23,6 +23,7 @@ export interface Project {
   scope?: string | null;
   status: string;
   published: boolean;
+  featured?: boolean;
   /** @nullable */
   longDescription?: string | null;
   /** @nullable */

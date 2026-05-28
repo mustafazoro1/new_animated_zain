@@ -157,31 +157,33 @@ export default function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.08, duration: 0.6 }}
-                    className="bg-[hsl(220,18%,12%)] border border-[hsl(220,15%,18%)] hover:border-[hsl(38,72%,52%)/40%] transition-all duration-300 group"
                   >
-                    <div className="aspect-[4/3] overflow-hidden relative bg-[hsl(220,15%,16%)]">
-                      <img
-                        src={item.imageUrl || MACHINERY_FALLBACK}
-                        alt={item.name}
-                        className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-600"
-                        onError={e => { (e.target as HTMLImageElement).src = MACHINERY_FALLBACK; }}
-                      />
-                      {item.category && (
-                        <span className="absolute top-2 left-2 text-[9px] tracking-[0.2em] uppercase bg-[hsl(220,18%,9%)/80%] text-[hsl(38,72%,52%)] px-2 py-0.5 backdrop-blur-sm">
-                          {item.category}
-                        </span>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-serif font-bold text-sm uppercase tracking-tight mb-1 group-hover:text-[hsl(38,72%,52%)] transition-colors">{item.name}</h3>
-                      <div className="flex gap-3 text-[10px] text-[hsl(220,12%,45%)] mb-2">
-                        {item.year && <span>{item.year}</span>}
-                        {item.condition && <><span>·</span><span>{item.condition}</span></>}
+                    <Link href={`/machinery/${item.slug}`} className="block bg-[hsl(220,18%,12%)] border border-[hsl(220,15%,18%)] hover:border-[hsl(38,72%,52%)] transition-all duration-300 group">
+                      <div className="aspect-[4/3] overflow-hidden relative bg-[hsl(220,15%,16%)]">
+                        <img
+                          src={item.imageUrl || MACHINERY_FALLBACK}
+                          alt={item.name}
+                          className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                          onError={e => { (e.target as HTMLImageElement).src = MACHINERY_FALLBACK; }}
+                        />
+                        {item.category && (
+                          <span className="absolute top-2 left-2 text-[9px] tracking-[0.2em] uppercase bg-[hsl(220,18%,9%)]/80 text-[hsl(38,72%,52%)] px-2 py-0.5 backdrop-blur-sm">
+                            {item.category}
+                          </span>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[hsl(220,18%,9%)]/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
                       </div>
-                      {item.description && (
-                        <p className="text-xs text-[hsl(220,12%,50%)] leading-relaxed line-clamp-2">{item.description}</p>
-                      )}
-                    </div>
+                      <div className="p-4">
+                        <h3 className="font-serif font-bold text-sm uppercase tracking-tight mb-1 group-hover:text-[hsl(38,72%,52%)] transition-colors">{item.name}</h3>
+                        <div className="flex gap-3 text-[10px] text-[hsl(220,12%,45%)] mb-2">
+                          {item.year && <span>{item.year}</span>}
+                          {item.condition && <><span>·</span><span>{item.condition}</span></>}
+                        </div>
+                        {item.description && (
+                          <p className="text-xs text-[hsl(220,12%,50%)] leading-relaxed line-clamp-2">{item.description}</p>
+                        )}
+                      </div>
+                    </Link>
                   </motion.div>
                 ))}
               </div>

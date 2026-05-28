@@ -32,6 +32,7 @@ export default function AdminProjectEdit() {
     longDescription: "",
     categoryId: "" as number | string,
     year: "",
+    featured: false,
   });
 
   const [isSaved, setIsSaved] = useState(false);
@@ -62,15 +63,17 @@ export default function AdminProjectEdit() {
         longDescription: fullProject.longDescription || "",
         categoryId: fullProject.categoryId || "",
         year: fullProject.year || "",
+        featured: fullProject.featured ?? false,
       });
     }
   }, [fullProject]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
+    const val = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
     setFormData(prev => ({
       ...prev,
-      [name]: name === "categoryId" ? (value === "" ? null : parseInt(value, 10)) : value
+      [name]: name === "categoryId" ? (value === "" ? null : parseInt(value, 10)) : val
     }));
     setIsSaved(false);
   };
@@ -186,6 +189,21 @@ export default function AdminProjectEdit() {
                 <input name="scope" value={formData.scope} onChange={handleChange} className="w-full bg-neutral-900 border border-neutral-800 px-4 py-3 text-white focus:border-white transition-colors" />
               </div>
             </div>
+          </div>
+
+          {/* Featured toggle */}
+          <div className="pt-4 flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="featured"
+              name="featured"
+              checked={formData.featured}
+              onChange={handleChange}
+              className="w-4 h-4 accent-[hsl(38,72%,52%)]"
+            />
+            <label htmlFor="featured" className="text-xs tracking-[0.15em] uppercase text-[hsl(220,12%,55%)]">
+              Show on home page (Selected Works)
+            </label>
           </div>
 
           <div className="space-y-6 pt-6">

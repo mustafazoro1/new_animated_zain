@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +12,7 @@ import Projects from "@/pages/projects";
 import ProjectDetail from "@/pages/project-detail";
 import Contact from "@/pages/contact";
 import MachineryPage from "@/pages/machinery";
+import MachineryDetail from "@/pages/machinery-detail";
 import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProjectNew from "@/pages/admin/project-new";
@@ -24,10 +25,13 @@ import AdminSettings from "@/pages/admin/settings";
 const queryClient = new QueryClient();
 
 function Router() {
+  const [location] = useLocation();
+  const isAdmin = location.startsWith("/admin");
+
   return (
     <>
       <ParticleBackground />
-      <Navbar />
+      {!isAdmin && <Navbar />}
       <CustomCursor />
       <Switch>
         {/* Public routes */}
@@ -40,6 +44,9 @@ function Router() {
         </Route>
         <Route path="/machinery">
           <div className="pt-24"><MachineryPage /></div>
+        </Route>
+        <Route path="/machinery/:slug">
+          <div className="pt-24"><MachineryDetail /></div>
         </Route>
         <Route path="/contact">
           <div className="pt-24"><Contact /></div>

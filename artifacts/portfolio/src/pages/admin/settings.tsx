@@ -1,8 +1,8 @@
 import { AdminLayout } from "@/components/layout/AdminLayout";
-import { useGetSettings, useUpdateSettings } from "@workspace/api-client-react";
+import { useGetSettings, useUpdateSettings, useChangeAdminPassword } from "@workspace/api-client-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Save, RotateCcw } from "lucide-react";
+import { Save, RotateCcw, Lock, Eye, EyeOff } from "lucide-react";
 
 const FIELDS = [
   { key: "phone", label: "Phone Number", placeholder: "+92 21 3456 7890", type: "text" },
@@ -18,8 +18,14 @@ type SettingsKey = typeof FIELDS[number]["key"];
 export default function AdminSettings() {
   const { data: settings, isLoading } = useGetSettings();
   const updateMutation = useUpdateSettings();
+  const changePassword = useChangeAdminPassword();
   const [form, setForm] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState(false);
+  const [pwForm, setPwForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [pwError, setPwError] = useState("");
+  const [pwSaved, setPwSaved] = useState(false);
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
 
   useEffect(() => {
     if (settings) {
@@ -46,6 +52,34 @@ export default function AdminSettings() {
         setTimeout(() => setSaved(false), 3000);
       },
     });
+  };
+
+  const handlePasswordChange = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwError("");
+    if (pwForm.newPassword !== pwForm.confirmPassword) {
+      setPwError("New passwords do not match");
+      return;
+    }
+    if (pwForm.newPassword.includes(" ")) {
+      setPwError("Password cannot contain spaces");
+      return;
+    }
+    if (pwForm.newPassword.length < 4) {
+      setPwError("New password must be at least 4 characters");
+      return;
+    }
+    changePassword.mutate(
+      { data: { currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword } },
+      {
+        onSuccess: () => {
+          setPwSaved(true);
+          setPwForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+          setTimeout(() => setPwSaved(false), 4000);
+        },
+        onError: () => setPwError("Current password is incorrect"),
+      }
+    );
   };
 
   const handleReset = () => {
@@ -155,6 +189,91 @@ export default function AdminSettings() {
           </div>
         </form>
       )}
+      {/* Password Change */}
+      <div className="mt-12 pt-10 border-t border-[hsl(220,15%,18%)]">
+        <div className="flex items-center gap-3 mb-6">
+          <Lock size={14} className="text-[hsl(220,12%,45%)]" />
+          <p className="text-[10px] tracking-[0.3em] uppercase text-gray-500">Change Admin Password</p>
+        </div>
+
+        <form onSubmit={handlePasswordChange} className="max-w-md space-y-4">
+          {/* Current Password */}
+          <div>
+            <label className="block text-[10px] tracking-[0.25em] uppercase text-gray-400 mb-2">Current Password</label>
+            <div className="relative">
+              <input
+                type={showCurrent ? "text" : "password"}
+                value={pwForm.currentPassword}
+                onChange={e => setPwForm(p => ({ ...p, currentPassword: e.target.value }))}
+                required
+                className="w-full border px-4 py-3 pr-10 text-sm focus:outline-none transition-colors text-white"
+                style={{ backgroundColor: "hsl(220,18%,12%)", borderColor: "hsl(220,15%,24%)" }}
+                onFocus={e => (e.currentTarget.style.borderColor = "hsl(38,72%,52%)")}
+                onBlur={e => (e.currentTarget.style.borderColor = "hsl(220,15%,24%)")}
+              />
+              <button type="button" onClick={() => setShowCurrent(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400">
+                {showCurrent ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+            </div>
+          </div>
+
+          {/* New Password */}
+          <div>
+            <label className="block text-[10px] tracking-[0.25em] uppercase text-gray-400 mb-2">New Password</label>
+            <div className="relative">
+              <input
+                type={showNew ? "text" : "password"}
+                value={pwForm.newPassword}
+                onChange={e => setPwForm(p => ({ ...p, newPassword: e.target.value }))}
+                required
+                className="w-full border px-4 py-3 pr-10 text-sm focus:outline-none transition-colors text-white"
+                style={{ backgroundColor: "hsl(220,18%,12%)", borderColor: "hsl(220,15%,24%)" }}
+                onFocus={e => (e.currentTarget.style.borderColor = "hsl(38,72%,52%)")}
+                onBlur={e => (e.currentTarget.style.borderColor = "hsl(220,15%,24%)")}
+              />
+              <button type="button" onClick={() => setShowNew(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400">
+                {showNew ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Confirm Password */}
+          <div>
+            <label className="block text-[10px] tracking-[0.25em] uppercase text-gray-400 mb-2">Confirm New Password</label>
+            <input
+              type="password"
+              value={pwForm.confirmPassword}
+              onChange={e => setPwForm(p => ({ ...p, confirmPassword: e.target.value }))}
+              required
+              className="w-full border px-4 py-3 text-sm focus:outline-none transition-colors text-white"
+              style={{ backgroundColor: "hsl(220,18%,12%)", borderColor: "hsl(220,15%,24%)" }}
+              onFocus={e => (e.currentTarget.style.borderColor = "hsl(38,72%,52%)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "hsl(220,15%,24%)")}
+            />
+          </div>
+
+          {pwError && <p className="text-red-400 text-xs">{pwError}</p>}
+
+          <div className="flex items-center gap-4 pt-2">
+            <button
+              type="submit"
+              disabled={changePassword.isPending}
+              className="inline-flex items-center gap-2 px-6 py-3 text-xs tracking-[0.2em] uppercase font-bold transition-colors disabled:opacity-50"
+              style={{ backgroundColor: "hsl(38,72%,52%)", color: "hsl(220,18%,9%)" }}
+              onMouseEnter={e => { if (!changePassword.isPending) e.currentTarget.style.backgroundColor = "hsl(38,72%,62%)"; }}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "hsl(38,72%,52%)")}
+            >
+              <Lock size={12} />
+              {changePassword.isPending ? "Changing..." : "Change Password"}
+            </button>
+            {pwSaved && (
+              <span className="text-xs tracking-widest uppercase" style={{ color: "hsl(38,72%,58%)" }}>
+                ✓ Password changed
+              </span>
+            )}
+          </div>
+        </form>
+      </div>
     </AdminLayout>
   );
 }

@@ -19,8 +19,11 @@ export interface MachineryItem {
   /** @nullable */
   imageUrl?: string | null;
   /** @nullable */
+  galleryImages?: string | null;
+  /** @nullable */
   year?: string | null;
   /** @nullable */
   condition?: string | null;
   published: boolean;
+  featured?: boolean;
 }

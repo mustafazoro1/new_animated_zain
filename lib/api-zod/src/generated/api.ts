@@ -125,6 +125,7 @@ export const ListProjectsResponseItem = zod.object({
   "sector": zod.string().nullish(),
   "status": zod.string(),
   "published": zod.boolean(),
+  "featured": zod.boolean().optional(),
   "categoryId": zod.number().nullish(),
   "categoryName": zod.string().nullish(),
   "heroImage": zod.string().nullish(),
@@ -152,7 +153,8 @@ export const CreateProjectBody = zod.object({
   "longDescription": zod.string().optional(),
   "categoryId": zod.number().nullish(),
   "year": zod.string().optional(),
-  "published": zod.boolean().optional()
+  "published": zod.boolean().optional(),
+  "featured": zod.boolean().optional()
 })
 
 
@@ -168,6 +170,7 @@ export const ListFeaturedProjectsResponseItem = zod.object({
   "sector": zod.string().nullish(),
   "status": zod.string(),
   "published": zod.boolean(),
+  "featured": zod.boolean().optional(),
   "categoryId": zod.number().nullish(),
   "categoryName": zod.string().nullish(),
   "heroImage": zod.string().nullish(),
@@ -194,6 +197,7 @@ export const GetProjectResponse = zod.object({
   "scope": zod.string().nullish(),
   "status": zod.string(),
   "published": zod.boolean(),
+  "featured": zod.boolean().optional(),
   "longDescription": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "categoryName": zod.string().nullish(),
@@ -232,7 +236,8 @@ export const UpdateProjectBody = zod.object({
   "longDescription": zod.string().optional(),
   "categoryId": zod.number().nullish(),
   "year": zod.string().optional(),
-  "published": zod.boolean().optional()
+  "published": zod.boolean().optional(),
+  "featured": zod.boolean().optional()
 })
 
 export const UpdateProjectResponse = zod.object({
@@ -246,6 +251,7 @@ export const UpdateProjectResponse = zod.object({
   "scope": zod.string().nullish(),
   "status": zod.string(),
   "published": zod.boolean(),
+  "featured": zod.boolean().optional(),
   "longDescription": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "categoryName": zod.string().nullish(),
@@ -283,6 +289,7 @@ export const ToggleProjectPublishResponse = zod.object({
   "scope": zod.string().nullish(),
   "status": zod.string(),
   "published": zod.boolean(),
+  "featured": zod.boolean().optional(),
   "longDescription": zod.string().nullish(),
   "categoryId": zod.number().nullish(),
   "categoryName": zod.string().nullish(),
@@ -387,9 +394,11 @@ export const ListMachineryResponseItem = zod.object({
   "description": zod.string().nullish(),
   "longDescription": zod.string().nullish(),
   "imageUrl": zod.string().nullish(),
+  "galleryImages": zod.string().nullish(),
   "year": zod.string().nullish(),
   "condition": zod.string().nullish(),
-  "published": zod.boolean()
+  "published": zod.boolean(),
+  "featured": zod.boolean().optional()
 })
 export const ListMachineryResponse = zod.array(ListMachineryResponseItem)
 
@@ -408,9 +417,11 @@ export const CreateMachineryBody = zod.object({
   "description": zod.string().optional(),
   "longDescription": zod.string().optional(),
   "imageUrl": zod.string().optional(),
+  "galleryImages": zod.string().optional(),
   "year": zod.string().optional(),
   "condition": zod.string().optional(),
-  "published": zod.boolean().optional()
+  "published": zod.boolean().optional(),
+  "featured": zod.boolean().optional()
 })
 
 
@@ -429,9 +440,11 @@ export const GetMachineryResponse = zod.object({
   "description": zod.string().nullish(),
   "longDescription": zod.string().nullish(),
   "imageUrl": zod.string().nullish(),
+  "galleryImages": zod.string().nullish(),
   "year": zod.string().nullish(),
   "condition": zod.string().nullish(),
-  "published": zod.boolean()
+  "published": zod.boolean(),
+  "featured": zod.boolean().optional()
 })
 
 
@@ -453,9 +466,11 @@ export const UpdateMachineryBody = zod.object({
   "description": zod.string().optional(),
   "longDescription": zod.string().optional(),
   "imageUrl": zod.string().optional(),
+  "galleryImages": zod.string().optional(),
   "year": zod.string().optional(),
   "condition": zod.string().optional(),
-  "published": zod.boolean().optional()
+  "published": zod.boolean().optional(),
+  "featured": zod.boolean().optional()
 })
 
 export const UpdateMachineryResponse = zod.object({
@@ -466,9 +481,11 @@ export const UpdateMachineryResponse = zod.object({
   "description": zod.string().nullish(),
   "longDescription": zod.string().nullish(),
   "imageUrl": zod.string().nullish(),
+  "galleryImages": zod.string().nullish(),
   "year": zod.string().nullish(),
   "condition": zod.string().nullish(),
-  "published": zod.boolean()
+  "published": zod.boolean(),
+  "featured": zod.boolean().optional()
 })
 
 
@@ -491,9 +508,11 @@ export const ToggleMachineryPublishResponse = zod.object({
   "description": zod.string().nullish(),
   "longDescription": zod.string().nullish(),
   "imageUrl": zod.string().nullish(),
+  "galleryImages": zod.string().nullish(),
   "year": zod.string().nullish(),
   "condition": zod.string().nullish(),
-  "published": zod.boolean()
+  "published": zod.boolean(),
+  "featured": zod.boolean().optional()
 })
 
 
@@ -502,6 +521,23 @@ export const ToggleMachineryPublishResponse = zod.object({
  */
 export const DeleteMachineryParams = zod.object({
   "id": zod.coerce.number()
+})
+
+
+/**
+ * @summary Change admin password
+ */
+
+
+
+
+export const ChangeAdminPasswordBody = zod.object({
+  "currentPassword": zod.string().min(1),
+  "newPassword": zod.string().min(1)
+})
+
+export const ChangeAdminPasswordResponse = zod.object({
+  "success": zod.boolean().optional()
 })
 
 

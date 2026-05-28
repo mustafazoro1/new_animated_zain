@@ -10,9 +10,11 @@ export const machineryTable = pgTable("machinery", {
   description: text("description"),
   longDescription: text("long_description"),
   imageUrl: text("image_url"),
+  galleryImages: text("gallery_images"),
   year: text("year"),
   condition: text("condition"),
   published: boolean("published").notNull().default(true),
+  featured: boolean("featured").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

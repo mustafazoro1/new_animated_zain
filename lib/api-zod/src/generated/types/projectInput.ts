@@ -22,4 +22,5 @@ export interface ProjectInput {
   categoryId?: number | null;
   year?: string;
   published?: boolean;
+  featured?: boolean;
 }

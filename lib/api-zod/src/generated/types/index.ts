@@ -7,9 +7,11 @@
  */
 
 export * from './adminCredentials';
+export * from './adminPasswordChange';
 export * from './adminSession';
 export * from './category';
 export * from './categoryInput';
+export * from './changeAdminPassword200';
 export * from './healthStatus';
 export * from './listMachineryParams';
 export * from './listProjectsParams';

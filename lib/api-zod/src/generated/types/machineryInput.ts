@@ -15,7 +15,9 @@ export interface MachineryInput {
   description?: string;
   longDescription?: string;
   imageUrl?: string;
+  galleryImages?: string;
   year?: string;
   condition?: string;
   published?: boolean;
+  featured?: boolean;
 }

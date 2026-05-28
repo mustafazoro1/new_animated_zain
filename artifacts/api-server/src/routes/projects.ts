@@ -23,6 +23,7 @@ function buildProjectSummary(row: {
   sector: string | null;
   status: string;
   published: boolean;
+  featured: boolean;
   categoryId: number | null;
   year: string | null;
   categoryName: string | null;
@@ -37,6 +38,7 @@ function buildProjectSummary(row: {
     sector: row.sector,
     status: row.status,
     published: row.published,
+    featured: row.featured,
     categoryId: row.categoryId,
     year: row.year,
     categoryName: row.categoryName,
@@ -61,6 +63,7 @@ router.get("/projects/featured", async (_req, res): Promise<void> => {
       sector: projectsTable.sector,
       status: projectsTable.status,
       published: projectsTable.published,
+      featured: projectsTable.featured,
       categoryId: projectsTable.categoryId,
       year: projectsTable.year,
       categoryName: categoriesTable.name,
@@ -69,10 +72,41 @@ router.get("/projects/featured", async (_req, res): Promise<void> => {
     .from(projectsTable)
     .leftJoin(categoriesTable, eq(projectsTable.categoryId, categoriesTable.id))
     .leftJoin(heroImageSq, eq(heroImageSq.projectId, projectsTable.id))
-    .where(eq(projectsTable.published, true))
+    .where(and(eq(projectsTable.published, true), eq(projectsTable.featured, true)))
     .orderBy(desc(projectsTable.createdAt))
     .limit(8);
 
+  if (rows.length === 0) {
+    const fallbackSq = db
+      .select({ projectId: projectImagesTable.projectId, imageUrl: projectImagesTable.imageUrl })
+      .from(projectImagesTable)
+      .where(eq(projectImagesTable.isHero, true))
+      .as("hero_images_fb");
+    const fallback = await db
+      .select({
+        id: projectsTable.id,
+        title: projectsTable.title,
+        slug: projectsTable.slug,
+        location: projectsTable.location,
+        client: projectsTable.client,
+        sector: projectsTable.sector,
+        status: projectsTable.status,
+        published: projectsTable.published,
+        featured: projectsTable.featured,
+        categoryId: projectsTable.categoryId,
+        year: projectsTable.year,
+        categoryName: categoriesTable.name,
+        heroImage: fallbackSq.imageUrl,
+      })
+      .from(projectsTable)
+      .leftJoin(categoriesTable, eq(projectsTable.categoryId, categoriesTable.id))
+      .leftJoin(fallbackSq, eq(fallbackSq.projectId, projectsTable.id))
+      .where(eq(projectsTable.published, true))
+      .orderBy(desc(projectsTable.createdAt))
+      .limit(8);
+    res.json(fallback.map(buildProjectSummary));
+    return;
+  }
   res.json(rows.map(buildProjectSummary));
 });
 
@@ -107,6 +141,7 @@ router.get("/projects", async (req, res): Promise<void> => {
       sector: projectsTable.sector,
       status: projectsTable.status,
       published: projectsTable.published,
+      featured: projectsTable.featured,
       categoryId: projectsTable.categoryId,
       year: projectsTable.year,
       categoryName: categoriesTable.name,
@@ -228,6 +263,7 @@ async function getFullProject(id: number) {
       scope: projectsTable.scope,
       status: projectsTable.status,
       published: projectsTable.published,
+      featured: projectsTable.featured,
       longDescription: projectsTable.longDescription,
       categoryId: projectsTable.categoryId,
       year: projectsTable.year,

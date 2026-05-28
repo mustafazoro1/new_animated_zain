@@ -34,9 +34,11 @@ router.get("/machinery", async (req, res): Promise<void> => {
     description: r.description,
     longDescription: r.longDescription,
     imageUrl: r.imageUrl,
+    galleryImages: r.galleryImages,
     year: r.year,
     condition: r.condition,
     published: r.published,
+    featured: r.featured,
   })));
 });
 
@@ -47,7 +49,7 @@ router.post("/machinery", async (req, res): Promise<void> => {
     return;
   }
   const [item] = await db.insert(machineryTable).values(parsed.data).returning();
-  res.status(201).json({ ...item, imageUrl: item.imageUrl });
+  res.status(201).json({ ...item });
 });
 
 router.get("/machinery/:slug", async (req, res): Promise<void> => {
@@ -62,7 +64,7 @@ router.get("/machinery/:slug", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Machinery not found" });
     return;
   }
-  res.json({ ...item });
+  res.json(item);
 });
 
 router.put("/machinery/:id/update", async (req, res): Promise<void> => {
@@ -82,7 +84,7 @@ router.put("/machinery/:id/update", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Machinery not found" });
     return;
   }
-  res.json({ ...item, imageUrl: item.imageUrl });
+  res.json(item);
 });
 
 router.patch("/machinery/:id/publish", async (req, res): Promise<void> => {
@@ -102,7 +104,7 @@ router.patch("/machinery/:id/publish", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Machinery not found" });
     return;
   }
-  res.json({ ...item, imageUrl: item.imageUrl });
+  res.json(item);
 });
 
 router.delete("/machinery/:id/delete", async (req, res): Promise<void> => {

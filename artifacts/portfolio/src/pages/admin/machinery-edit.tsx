@@ -34,13 +34,20 @@ export default function AdminMachineryEdit() {
     description: "",
     longDescription: "",
     imageUrl: "",
+    galleryImages: "",
     year: "",
     condition: "",
     published: true,
+    featured: false,
   });
 
   useEffect(() => {
     if (existing) {
+      let galleryStr = "";
+      try {
+        const parsed = existing.galleryImages ? JSON.parse(existing.galleryImages as string) : [];
+        galleryStr = Array.isArray(parsed) ? parsed.join("\n") : "";
+      } catch { galleryStr = ""; }
       setForm({
         name: existing.name || "",
         slug: existing.slug || "",
@@ -48,9 +55,11 @@ export default function AdminMachineryEdit() {
         description: existing.description || "",
         longDescription: (existing as any).longDescription || "",
         imageUrl: existing.imageUrl || "",
+        galleryImages: galleryStr,
         year: existing.year || "",
         condition: existing.condition || "",
         published: existing.published,
+        featured: existing.featured ?? false,
       });
     }
   }, [existing]);
@@ -69,11 +78,19 @@ export default function AdminMachineryEdit() {
     }
   };
 
+  const buildPayload = () => {
+    const galleryArr = form.galleryImages
+      .split("\n")
+      .map(s => s.trim())
+      .filter(Boolean);
+    return { ...form, galleryImages: galleryArr.length ? JSON.stringify(galleryArr) : "" };
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isNew) {
       createMachinery.mutate(
-        { data: form },
+        { data: buildPayload() },
         {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: getListMachineryQueryKey() });
@@ -83,7 +100,7 @@ export default function AdminMachineryEdit() {
       );
     } else if (machineryId) {
       updateMachinery.mutate(
-        { id: machineryId, data: form },
+        { id: machineryId, data: buildPayload() },
         {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: getListMachineryQueryKey() });
@@ -227,19 +244,58 @@ export default function AdminMachineryEdit() {
             />
           </div>
 
-          {/* Published toggle */}
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="published"
-              name="published"
-              checked={form.published}
-              onChange={handleChange}
-              className="w-4 h-4 accent-[hsl(38,72%,52%)]"
-            />
-            <label htmlFor="published" className="text-xs tracking-[0.15em] uppercase text-[hsl(220,12%,55%)]">
-              Visible on public machinery page
+          {/* Gallery Images */}
+          <div>
+            <label className="block text-[10px] tracking-[0.25em] uppercase text-[hsl(220,12%,45%)] mb-2">
+              Gallery Images <span className="text-[hsl(220,12%,35%)] normal-case tracking-normal">(one URL per line)</span>
             </label>
+            <textarea
+              name="galleryImages"
+              value={form.galleryImages}
+              onChange={handleChange}
+              rows={5}
+              placeholder={"https://example.com/img1.jpg\nhttps://example.com/img2.jpg"}
+              className="w-full bg-[hsl(220,18%,12%)] border border-[hsl(220,15%,20%)] text-foreground px-4 py-3 text-sm focus:outline-none focus:border-[hsl(38,72%,52%)] transition-colors resize-none placeholder:text-[hsl(220,12%,30%)] font-mono"
+            />
+            {form.galleryImages.split("\n").filter(Boolean).length > 0 && (
+              <div className="mt-3 flex gap-2 flex-wrap">
+                {form.galleryImages.split("\n").filter(s => s.trim()).map((url, i) => (
+                  <div key={i} className="w-20 h-14 overflow-hidden border border-[hsl(220,15%,18%)] bg-[hsl(220,18%,11%)]">
+                    <img src={url.trim()} alt="" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.opacity = "0.2"; }} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Toggles */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="published"
+                name="published"
+                checked={form.published}
+                onChange={handleChange}
+                className="w-4 h-4 accent-[hsl(38,72%,52%)]"
+              />
+              <label htmlFor="published" className="text-xs tracking-[0.15em] uppercase text-[hsl(220,12%,55%)]">
+                Visible on public machinery page
+              </label>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="featured"
+                name="featured"
+                checked={form.featured}
+                onChange={handleChange}
+                className="w-4 h-4 accent-[hsl(38,72%,52%)]"
+              />
+              <label htmlFor="featured" className="text-xs tracking-[0.15em] uppercase text-[hsl(220,12%,55%)]">
+                Show on home page (Our Machinery)
+              </label>
+            </div>
           </div>
 
           {/* Submit */}

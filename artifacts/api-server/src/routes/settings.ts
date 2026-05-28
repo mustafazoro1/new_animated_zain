@@ -27,7 +27,7 @@ router.get("/settings", async (req, res): Promise<void> => {
 });
 
 router.put("/admin/settings", async (req, res): Promise<void> => {
-  if (!(req.session as Record<string, unknown>).adminAuthenticated) {
+  if (!(req.session as unknown as Record<string, unknown>).adminAuthenticated) {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }

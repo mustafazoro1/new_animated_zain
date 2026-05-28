@@ -57,6 +57,7 @@ export interface ProjectSummary {
   sector?: string | null;
   status: string;
   published: boolean;
+  featured?: boolean;
   /** @nullable */
   categoryId?: number | null;
   /** @nullable */
@@ -83,6 +84,7 @@ export interface Project {
   scope?: string | null;
   status: string;
   published: boolean;
+  featured?: boolean;
   /** @nullable */
   longDescription?: string | null;
   /** @nullable */
@@ -112,6 +114,7 @@ export interface ProjectInput {
   categoryId?: number | null;
   year?: string;
   published?: boolean;
+  featured?: boolean;
 }
 
 export interface PublishToggle {
@@ -131,10 +134,13 @@ export interface MachineryItem {
   /** @nullable */
   imageUrl?: string | null;
   /** @nullable */
+  galleryImages?: string | null;
+  /** @nullable */
   year?: string | null;
   /** @nullable */
   condition?: string | null;
   published: boolean;
+  featured?: boolean;
 }
 
 export interface MachineryInput {
@@ -146,9 +152,18 @@ export interface MachineryInput {
   description?: string;
   longDescription?: string;
   imageUrl?: string;
+  galleryImages?: string;
   year?: string;
   condition?: string;
   published?: boolean;
+  featured?: boolean;
+}
+
+export interface AdminPasswordChange {
+  /** @minLength 1 */
+  currentPassword: string;
+  /** @minLength 1 */
+  newPassword: string;
 }
 
 export interface AdminCredentials {
@@ -178,5 +193,9 @@ category_id?: number;
 
 export type ListMachineryParams = {
 published?: boolean;
+};
+
+export type ChangeAdminPassword200 = {
+  success?: boolean;
 };
 

@@ -493,6 +493,32 @@ paths:
         "204":
           description: Deleted
 
+  /admin/password:
+    put:
+      operationId: changeAdminPassword
+      tags: [admin]
+      summary: Change admin password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminPasswordChange"
+      responses:
+        "200":
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "401":
+          description: Current password incorrect
+        "400":
+          description: Validation error
+
   /admin/login:
     post:
       operationId: adminLogin
@@ -633,6 +659,8 @@ components:
           type: string
         published:
           type: boolean
+        featured:
+          type: boolean
         categoryId:
           type: ["integer", "null"]
         categoryName:
@@ -665,6 +693,8 @@ components:
         status:
           type: string
         published:
+          type: boolean
+        featured:
           type: boolean
         longDescription:
           type: ["string", "null"]
@@ -711,6 +741,8 @@ components:
           type: string
         published:
           type: boolean
+        featured:
+          type: boolean
 
     PublishToggle:
       type: object
@@ -737,11 +769,15 @@ components:
           type: ["string", "null"]
         imageUrl:
           type: ["string", "null"]
+        galleryImages:
+          type: ["string", "null"]
         year:
           type: ["string", "null"]
         condition:
           type: ["string", "null"]
         published:
+          type: boolean
+        featured:
           type: boolean
 
     MachineryInput:
@@ -762,12 +798,27 @@ components:
           type: string
         imageUrl:
           type: string
+        galleryImages:
+          type: string
         year:
           type: string
         condition:
           type: string
         published:
           type: boolean
+        featured:
+          type: boolean
+
+    AdminPasswordChange:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+          minLength: 1
+        newPassword:
+          type: string
+          minLength: 1
 
     AdminCredentials:
       type: object
